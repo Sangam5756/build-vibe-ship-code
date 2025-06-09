@@ -1,7 +1,8 @@
 const express = require("express");
-const { getLogs } = require("../../controller/log.controller");
+const { logController } = require("../../controller");
+
 const logRouter = express.Router();
 
-logRouter.get("/", getLogs);
+logRouter.get("/", logController.getLogs);
 
 module.exports = logRouter;

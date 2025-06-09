@@ -1,5 +1,6 @@
 const { saveLog, getLogs } = require("../repository/log.repository");
 
+
 const logAction = async ({ sessionId, actionType, payload }) => {
   await saveLog({ sessionId, actionType, payload });
 };
