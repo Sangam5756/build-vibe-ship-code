@@ -1,20 +1,21 @@
 // src/utils/logger.js
-const { LogModel } = require('../models/logs.model');
+const Log = require("../models/logs.model");
 
 const logger = {
-  async logAction(actionType, payload = {}, sessionId = 'no_session') {
-    await LogModel.create({ sessionId, actionType, payload });
+  async logAction(actionType, payload = {}, sessionId) {
+    await new Log({ sessionId, actionType, payload });
+    // await Log.save();
   },
 
-  async getLogs(sessionId = null) {
+  async getLogs(sessionId) {
     if (sessionId) {
-      return await LogModel.find({ sessionId }).sort({ timestamp: -1 });
+      return await Log.find({ sessionId }).sort({ timestamp: -1 });
     }
-    return await LogModel.find().sort({ timestamp: -1 });
+    return await Log.find().sort({ timestamp: -1 });
   },
 
   async clearLogs() {
-    await LogModel.deleteMany({});
+    await Log.deleteMany({});
   },
 };
 

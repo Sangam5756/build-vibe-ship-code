@@ -1,21 +1,60 @@
 const { registerUser, loginUser } = require("../services/auth.service");
+const { StatusCodes } = require("http-status-codes");
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
   try {
     const user = await registerUser(req.body);
-    res.status(201).json({ message: "User registered", userId: user._id });
+
+    req.session.user = {
+      id: user._id,
+      username: user.username,
+    };
+
+    res.status(StatusCodes.CREATED).json({
+      success: true,
+      message: "Successfully registered",
+      error: {},
+      data: user._id,
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    next(err);
   }
 };
 
-const login = async (req, res) => {
+const login = async (req, res, next) => {
   try {
-    const { token, user } = await loginUser(req.body);
-    res.json({ token, userId: user._id, username: user.username });
+    const { user } = await loginUser(req.body); // 🛑 no token anymore
+
+    req.session.user = {
+      id: user._id,
+      username: user.username,
+    };
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: "Successfully logged in",
+      error: {},
+      data: {
+        userId: user._id,
+        username: user.username,
+      },
+    });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    next(err);
   }
 };
 
-module.exports = { register, login };
+
+const me = (req, res) => {
+  if (req.session.user) {
+    res.json({
+      loggedIn: true,
+      user: req.session.user,
+    });
+  } else {
+    res.status(401).json({ loggedIn: false, message: "Not authenticated" });
+  }
+};
+
+module.exports = { register, login, me };
+

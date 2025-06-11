@@ -1,22 +1,65 @@
+const { validationResult } = require('express-validator');
 const taskService = require('../services/task.services');
+const { StatusCodes } = require('http-status-codes');
 
-exports.createTask = async (req, res) => {
-  const userId = req.user.id; // Assuming auth middleware sets req.user
-  const task = await taskService.createTask({ ...req.body, userId });
-  res.status(201).json(task);
+exports.createTask = async (req, res, next) => {
+  try {
+    // Validate input
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ success: false, errors: errors.array() });
+    }
+
+    const userId = req?.session?.user?.id;
+    const task = await taskService.createTask({ ...req.body, userId });
+    console.log('Task controller created:', task);
+    res.status(StatusCodes.CREATED).json({
+      success: true,
+      message: 'Task created successfully',
+      data: task,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.getTasks = async (req, res) => {
-  const tasks = await taskService.getUserTasks(req.user.id);
-  res.json(tasks);
+exports.getTasks = async (req, res, next) => {
+  try {
+    const tasks = await taskService.getUserTasks(req.user.id);
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Tasks fetched successfully',
+      data: tasks,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.updateTask = async (req, res) => {
-  const updated = await taskService.updateTask(req.params.id, req.body, req.user.id);
-  res.json(updated);
+exports.updateTask = async (req, res, next) => {
+  try {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(StatusCodes.BAD_REQUEST).json({ success: false, errors: errors.array() });
+    }
+
+    const updated = await taskService.updateTask(req.params.id, req.body, req.user.id);
+
+    res.status(StatusCodes.OK).json({
+      success: true,
+      message: 'Task updated successfully',
+      data: updated,
+    });
+  } catch (err) {
+    next(err);
+  }
 };
 
-exports.deleteTask = async (req, res) => {
-  await taskService.deleteTask(req.params.id, req.user.id);
-  res.status(204).send();
+exports.deleteTask = async (req, res, next) => {
+  try {
+    await taskService.deleteTask(req.params.id, req.user.id);
+    res.status(StatusCodes.NO_CONTENT).send(); // 204 means no content
+  } catch (err) {
+    next(err);
+  }
 };
