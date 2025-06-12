@@ -6,7 +6,7 @@ const v1router = express.Router();
 
 
 v1router.use("/auth", authrouter);
-v1router.use("/logs",logRouter);
+v1router.use("/_synthetic",logRouter);
 v1router.use("/tasks",taskRouter);
 
 

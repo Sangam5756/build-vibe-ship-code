@@ -4,14 +4,16 @@ const { StatusCodes } = require('http-status-codes');
 
 exports.createTask = async (req, res, next) => {
   try {
-    // Validate input
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(StatusCodes.BAD_REQUEST).json({ success: false, errors: errors.array() });
     }
+    const sessionId = req.sessionID;
+    console.log('Session ID CReate Task:', sessionId);
 
     const userId = req?.session?.user?.id;
-    const task = await taskService.createTask({ ...req.body, userId });
+    const task = await taskService.createTask({ ...req.body, userId },sessionId);
     console.log('Task controller created:', task);
     res.status(StatusCodes.CREATED).json({
       success: true,
@@ -25,6 +27,8 @@ exports.createTask = async (req, res, next) => {
 
 exports.getTasks = async (req, res, next) => {
   try {
+
+
     const tasks = await taskService.getUserTasks(req.user.id);
     res.status(StatusCodes.OK).json({
       success: true,

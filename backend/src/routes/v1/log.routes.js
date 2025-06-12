@@ -4,7 +4,8 @@ const { isAuthenticated } = require("../../utils/auth.middleware");
 
 const logRouter = express.Router();
 
-logRouter.use(isAuthenticated);
+logRouter.get("/new_session", logController.newSyntheticSession);
+logRouter.get("/log_event", logController.logEvent);
 logRouter.get("/", logController.getLogs);
 
 module.exports = logRouter;

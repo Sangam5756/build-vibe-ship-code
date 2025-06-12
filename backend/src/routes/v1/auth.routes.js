@@ -7,6 +7,7 @@ const {
 const validateErrorHandler = require("../../utils/Validator");
 const authrouter = express.Router();
 
+
 authrouter.post(
   "/register",
   registerValidation,

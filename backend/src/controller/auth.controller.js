@@ -46,6 +46,7 @@ const login = async (req, res, next) => {
 
 
 const me = (req, res) => {
+  console.log(req.sessionID)
   if (req.session.user) {
     res.json({
       loggedIn: true,

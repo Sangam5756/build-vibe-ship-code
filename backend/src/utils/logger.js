@@ -3,13 +3,18 @@ const Log = require("../models/logs.model");
 
 const logger = {
   async logAction(actionType, payload = {}, sessionId) {
-    await new Log({ sessionId, actionType, payload });
-    // await Log.save();
+    const log = new Log({
+      sessionId: sessionId,
+      action_type: actionType,
+      payload,
+      timestamp: Date.now() / 1000,
+    });
+    await log.save();
   },
 
   async getLogs(sessionId) {
     if (sessionId) {
-      return await Log.find({ sessionId }).sort({ timestamp: -1 });
+      return await Log.find({ sessionId: sessionId }).sort({ timestamp: -1 });
     }
     return await Log.find().sort({ timestamp: -1 });
   },
